@@ -1,4 +1,6 @@
 const fetchCapitalBtn = document.getElementById('fetch-capital-btn');
+const fetchRegionBtn = document.getElementById('fetch-region-btn');
+
 const countryInfo = document.getElementById('country-info');
 const borderingCountries = document.getElementById('bordering-countries');
 
@@ -13,13 +15,34 @@ async function fetchCountryByCapital(capital) {
     }
 }
 
+async function fetchCountriesByRegion(region) {
+    try {
+        const res = await fetch(`https://restcountries.com/v3.1/region/${region}`);
+        if (!res.ok) throw new Error('Region not found');
+        const data = await res.json();
+        countryInfo.innerHTML = `<h2>Countries in ${region}</h2>`;
+        data.forEach(country => {
+            countryInfo.innerHTML += `
+                <section>
+                    <h3>${country.name.common}</h3>
+                    <p><strong>Capital:</strong> ${country.capital}</p>
+                    <p><strong>Population:</strong> ${country.population.toLocaleString()}</p>
+                    <p><strong>Region:</strong> ${country.region}</p>
+                    <img src="${country.flags.png}" alt="${country.name.common} flag">
+                </section>
+            `;
+        });
+    } catch (error) {
+        countryInfo.innerHTML = `<p>Error: ${error.message}</p>`;
+    }
+}
+
 function displayCountryInfo(country) {
     countryInfo.innerHTML = `
         <h2>${country.name.common}</h2>
         <p><strong>Capital:</strong> ${country.capital}</p>
         <p><strong>Population:</strong> ${country.population.toLocaleString()}</p>
         <p><strong>Region:</strong> ${country.region}</p>
-        <p><strong>Flag:</strong></p>
         <img src="${country.flags.png}" alt="${country.name.common} flag">
     `;
 
@@ -30,8 +53,10 @@ function displayCountryInfo(country) {
             const borderData = await borderRes.json();
             const neighbor = borderData[0];
             borderingCountries.innerHTML += `
-                <p>${neighbor.name.common}:</p>
-                <img src="${neighbor.flags.png}" alt="${neighbor.name.common} flag">
+                <section>
+                    <p>${neighbor.name.common}:</p>
+                    <img src="${neighbor.flags.png}" alt="${neighbor.name.common} flag">
+                </section>
             `;
         });
     } else {
@@ -44,4 +69,11 @@ fetchCapitalBtn.addEventListener('click', () => {
     countryInfo.innerHTML = '';
     borderingCountries.innerHTML = '';
     fetchCountryByCapital(capitalInput);
+});
+
+fetchRegionBtn.addEventListener('click', () => {
+    const regionInput = document.getElementById('region-input').value;
+    countryInfo.innerHTML = '';
+    borderingCountries.innerHTML = '';
+    fetchCountriesByRegion(regionInput);
 });
