@@ -1,10 +1,11 @@
-const fetchCapitalBtn = document.getElementById('fetch-capital-btn');
+const fetchCountryBtn = document.getElementById('fetch-country-btn');
 const countryInfo = document.getElementById('country-info');
 const borderingCountries = document.getElementById('bordering-countries');
 
 async function fetchCountryByName(countryName) {
     try {
         const res = await fetch(`https://restcountries.com/v3.1/name/${countryName}`);
+        if (!res.ok) throw new Error('Country not found.');
         const data = await res.json();
         displayCountryInfo(data[0]);
     } catch (error) {
@@ -14,14 +15,11 @@ async function fetchCountryByName(countryName) {
 }
 
 function displayCountryInfo(country) {
-    const capital = country.capital ? country.capital[0] : 'N/A';
-
     countryInfo.innerHTML = `
         <h2>${country.name.common}</h2>
-        <p><strong>Capital:</strong> ${capital}</p>
-        <p><strong>Population:</strong> ${country.population}</p>
-        <p><strong>Region:</strong> ${country.region}</p>
-        <p><img src="${country.flags.png}" alt="${country.name.common} flag"></p>
+        <p><strong>Capital:</strong> ${country.capital}</p>
+        <p><strong>Population:</strong> ${country.population.toLocaleString()}</p>
+        <img src="${country.flags.png}" alt="${country.name.common} flag">
     `;
 
     if (country.borders) {
@@ -36,12 +34,11 @@ function displayCountryInfo(country) {
     }
 }
 
-fetchCapitalBtn.addEventListener('click', () => {
-    const countryName = document.getElementById('capital-input').value.trim();
+fetchCountryBtn.addEventListener('click', () => {
+    const countryInput = document.getElementById('country-input').value;
     countryInfo.innerHTML = '';
     borderingCountries.innerHTML = '';
-    if(countryName) fetchCountryByName(countryName);
+    fetchCountryByName(countryInput);
 });
-
 
 
