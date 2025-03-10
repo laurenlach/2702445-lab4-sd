@@ -1,39 +1,16 @@
-const fetchCapitalBtn = document.getElementById('fetch-capital-btn');
-const fetchRegionBtn = document.getElementById('fetch-region-btn');
-
+const fetchCountryBtn = document.getElementById('fetch-country-btn');
 const countryInfo = document.getElementById('country-info');
 const borderingCountries = document.getElementById('bordering-countries');
 
-async function fetchCountryByCapital(capital) {
+async function fetchCountryByName(countryName) {
     try {
-        const res = await fetch(`https://restcountries.com/v3.1/capital/${capital}`);
+        const res = await fetch(`https://restcountries.com/v3.1/name/${countryName}`);
         if (!res.ok) throw new Error('Country not found');
         const data = await res.json();
         displayCountryInfo(data[0]);
     } catch (error) {
         countryInfo.innerHTML = `<p>Error: ${error.message}</p>`;
-    }
-}
-
-async function fetchCountriesByRegion(region) {
-    try {
-        const res = await fetch(`https://restcountries.com/v3.1/region/${region}`);
-        if (!res.ok) throw new Error('Region not found');
-        const data = await res.json();
-        countryInfo.innerHTML = `<h2>Countries in ${region}</h2>`;
-        data.forEach(country => {
-            countryInfo.innerHTML += `
-                <section>
-                    <h3>${country.name.common}</h3>
-                    <p><strong>Capital:</strong> ${country.capital}</p>
-                    <p><strong>Population:</strong> ${country.population.toLocaleString()}</p>
-                    <p><strong>Region:</strong> ${country.region}</p>
-                    <img src="${country.flags.png}" alt="${country.name.common} flag">
-                </section>
-            `;
-        });
-    } catch (error) {
-        countryInfo.innerHTML = `<p>Error: ${error.message}</p>`;
+        borderingCountries.innerHTML = '';
     }
 }
 
@@ -43,6 +20,7 @@ function displayCountryInfo(country) {
         <p><strong>Capital:</strong> ${country.capital}</p>
         <p><strong>Population:</strong> ${country.population.toLocaleString()}</p>
         <p><strong>Region:</strong> ${country.region}</p>
+        <p><strong>Flag:</strong></p>
         <img src="${country.flags.png}" alt="${country.name.common} flag">
     `;
 
@@ -53,10 +31,8 @@ function displayCountryInfo(country) {
             const borderData = await borderRes.json();
             const neighbor = borderData[0];
             borderingCountries.innerHTML += `
-                <section>
-                    <p>${neighbor.name.common}:</p>
-                    <img src="${neighbor.flags.png}" alt="${neighbor.name.common} flag">
-                </section>
+                <p>${neighbor.name.common}:</p>
+                <img src="${neighbor.flags.png}" alt="${neighbor.name.common} flag">
             `;
         });
     } else {
@@ -64,16 +40,10 @@ function displayCountryInfo(country) {
     }
 }
 
-fetchCapitalBtn.addEventListener('click', () => {
-    const capitalInput = document.getElementById('capital-input').value;
+fetchCountryBtn.addEventListener('click', () => {
+    const countryInput = document.getElementById('country-input').value;
     countryInfo.innerHTML = '';
     borderingCountries.innerHTML = '';
-    fetchCountryByCapital(capitalInput);
+    fetchCountryByName(countryInput);
 });
 
-fetchRegionBtn.addEventListener('click', () => {
-    const regionInput = document.getElementById('region-input').value;
-    countryInfo.innerHTML = '';
-    borderingCountries.innerHTML = '';
-    fetchCountriesByRegion(regionInput);
-});
